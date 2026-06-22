@@ -14,10 +14,12 @@ The point is to get a working, demo-able agent up and running as fast as possibl
   - IMPORTANT: This model only works with the `global` endpoint.
   - Copy the `.env` file into the agent directory. Use this file to set project/location. 
 
+- Commit and push the code to the GitHub Repository before deploying.
+
 - Deploy the agent to Agent Runtime (formerly called Vertex AI Agent Engine)
 
 Example command for how to deploy an ADK Agent to Agent Runtime. This should be run from the parent directory of where the agent code is.
 
 ```sh
-adk deploy agent_engine --region="us-west1" --display_name="Agent Display Name" directory_of_agent
+adk deploy agent_engine --region="us-east1" --display_name="Agent Display Name" directory_of_agent
 ```
