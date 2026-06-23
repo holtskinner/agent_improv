@@ -13,7 +13,7 @@ The point is to get a working, demo-able agent up and running as fast as possibl
 - Use the Gemini API on Agent Platform (formerly Vertex AI) with model `gemini-3.1-flash-lite`
   - IMPORTANT: This model only works with the `global` endpoint.
   - Copy the `.env` file into the agent directory. Use this file to set project/location. 
-
+- Don't test anything.
 - Commit and push the code to the GitHub Repository before deploying.
 
 - Deploy the agent to Agent Runtime (formerly called Vertex AI Agent Engine)
