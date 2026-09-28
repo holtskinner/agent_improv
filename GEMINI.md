@@ -21,5 +21,5 @@ The point is to get a working, demo-able agent up and running as fast as possibl
 Example command for how to deploy an ADK Agent to Agent Runtime. This should be run from the parent directory of where the agent code is.
 
 ```sh
-adk deploy agent_engine --region="us-east1" --display_name="Agent Display Name" directory_of_agent
+adk deploy agent_engine --region="us-central1" --display_name="Agent Display Name" directory_of_agent
 ```
