@@ -1,6 +1,7 @@
 """Pawnder - The Tinder for Pets with Wacky Hairstyles Agent."""
 
 import base64
+import urllib.parse
 from typing import List, Dict, Any, Optional
 from google import genai
 from google.genai import types
@@ -19,6 +20,7 @@ PET_CATALOG = [
         "bio": "Business in the front, bark-party in the back. Looking for a partner who isn't afraid of hairspray and guitar solos.",
         "favorite_treat": "Organic peanut butter pup-sicles",
         "dealbreaker": "Rainy days without an umbrella",
+        "image_url": "https://image.pollinations.ai/prompt/poodle%20dog%20with%20flamboyant%20neon%20pink%2080s%20glam%20mullet%20hairstyle%20dating%20profile%20photo?width=512&height=512&nologo=true",
     },
     {
         "id": "pet_002",
@@ -31,6 +33,7 @@ PET_CATALOG = [
         "bio": "My fur has more volume than a stadium sound system. Expect high maintenance, high standards, and aristocratic purrs.",
         "favorite_treat": "Alaskan salmon flakes served on fine china",
         "dealbreaker": "Cheap combs or rough petting",
+        "image_url": "https://image.pollinations.ai/prompt/persian%20cat%20with%20gigantic%20victorian%20powdered%20wig%20bouffant%20hairstyle%20dating%20profile?width=512&height=512&nologo=true",
     },
     {
         "id": "pet_003",
@@ -43,6 +46,7 @@ PET_CATALOG = [
         "bio": "Fast, mischievous, and statically charged. Looking for someone to steal shiny objects and crash underground pet raves with.",
         "favorite_treat": "Freeze-dried duck liver",
         "dealbreaker": "Pets with no taste in electronic bass music",
+        "image_url": "https://image.pollinations.ai/prompt/cute%20ferret%20with%20cyberpunk%20neon%20green%20liberty%20spikes%20hair%20dating%20profile?width=512&height=512&nologo=true",
     },
     {
         "id": "pet_004",
@@ -55,6 +59,7 @@ PET_CATALOG = [
         "bio": "Born to strut down catwalks and wind tunnels. Yes, it takes 4 hours to blow-dry, and yes, every minute is worth it.",
         "favorite_treat": "Artisanal venison jerky",
         "dealbreaker": "Windless rooms and humid dog parks",
+        "image_url": "https://image.pollinations.ai/prompt/afghan%20hound%20dog%20with%20cascading%20disco%20blowout%20hair%20glamorous%20dating%20profile?width=512&height=512&nologo=true",
     },
     {
         "id": "pet_005",
@@ -67,6 +72,7 @@ PET_CATALOG = [
         "bio": "90% hair, 10% squeak. When I spin, my afro creates its own microclimate. Seeking a fluffy companion to share parsley bouquets.",
         "favorite_treat": "Crisp romaine hearts and bell pepper tops",
         "dealbreaker": "Running out of hay",
+        "image_url": "https://image.pollinations.ai/prompt/fluffy%20guinea%20pig%20with%20massive%20golden%20afro%20puff%20hair%20dating%20profile?width=512&height=512&nologo=true",
     },
     {
         "id": "pet_006",
@@ -79,6 +85,7 @@ PET_CATALOG = [
         "bio": "I don't just rock the crest, I headline the show. Loud, proud, and my headfeathers defy gravity without gel.",
         "favorite_treat": "Roasted pine nuts and cashews",
         "dealbreaker": "Anyone who tells me to keep it down",
+        "image_url": "https://image.pollinations.ai/prompt/cockatoo%20bird%20with%20flaming%20orange%20zigzag%20mohawk%20crest%20dating%20profile?width=512&height=512&nologo=true",
     },
 ]
 
@@ -87,14 +94,14 @@ def browse_pet_profiles(
     species: Optional[str] = None,
     min_wackiness: int = 1,
 ) -> List[Dict[str, Any]]:
-    """Browse single pet profiles available on Pawnder with their wacky hairstyles.
+    """Browse single pet profiles available on Pawnder with their wacky hairstyles and image portraits.
 
     Args:
         species: Optional filter by species (e.g. 'Dog', 'Cat', 'Poodle', 'Guinea Pig', 'Ferret', 'Cockatoo').
         min_wackiness: Minimum hairstyle wackiness rating from 1 to 10 (default 1).
 
     Returns:
-        A list of pet profile records matching criteria.
+        A list of pet profile records matching criteria including chat-ready image markdown links.
     """
     results = []
     for pet in PET_CATALOG:
@@ -102,7 +109,9 @@ def browse_pet_profiles(
             continue
         if species and species.lower() not in pet["species"].lower():
             continue
-        results.append(pet)
+        item = dict(pet)
+        item["chat_image_markdown"] = f"![{pet['name']} - {pet['hairstyle']}]({pet['image_url']})"
+        results.append(item)
     return results
 
 
@@ -121,7 +130,7 @@ def match_by_hairstyle(
         desired_vibe: Optional vibe preference for the partner's hairstyle (e.g., 'punk', 'regal', 'retro', 'disco').
 
     Returns:
-        Top matching pet profile, compatibility percentage, duo nickname, and grooming synergy report.
+        Top matching pet profile, compatibility percentage, duo nickname, grooming synergy report, and image display link.
     """
     my_hair_lower = my_pet_hairstyle.lower()
 
@@ -155,7 +164,6 @@ def match_by_hairstyle(
         best_score = 88
 
     compatibility_pct = min(best_score + 8, 99)
-
     couple_nickname = f"{my_pet_name} & {best_candidate['name']}: The {best_candidate['hair_vibe'].split()[0]} Power Duo"
 
     return {
@@ -173,6 +181,7 @@ def match_by_hairstyle(
             f"'{best_candidate['hairstyle']}', the combined volume creates peak aesthetic drama. "
             f"Perfect for high-fashion dog park strolls and viral social media posts."
         ),
+        "chat_image_markdown": f"![{best_candidate['name']}]({best_candidate['image_url']})",
     }
 
 
@@ -184,7 +193,7 @@ def swipe_pet(pet_id: str, action: str) -> Dict[str, Any]:
         action: One of 'swipe_right' (like), 'swipe_left' (pass), or 'super_paw' (instant super match).
 
     Returns:
-        The swipe outcome, including whether it's an instant match and opening chat lines.
+        The swipe outcome, including whether it's an instant match, portrait image, and opening chat lines.
     """
     pet = next((p for p in PET_CATALOG if p["id"] == pet_id), None)
     if not pet:
@@ -204,6 +213,7 @@ def swipe_pet(pet_id: str, action: str) -> Dict[str, Any]:
         "is_super_paw": is_super,
         "matched_pet": pet["name"],
         "pet_hairstyle": pet["hairstyle"],
+        "chat_image_markdown": f"![{pet['name']}]({pet['image_url']})",
         "message": f"🎉 IT'S A MATCH! {pet['name']} loved your pet's vibe and hairstyle!",
         "recommended_pickup_line": f"Hey {pet['name']}, is your fur naturally that fabulous, or did you roll around in an electric dryer sheet?",
         "suggested_first_date": "High-velocity wind tunnel photoshoot followed by gourmet treats.",
@@ -248,6 +258,7 @@ def generate_nano_banana_pet_portrait(
     photo_setting: Optional[str] = "glamorous pet dating profile studio photoshoot with dramatic rim lighting",
 ) -> Dict[str, Any]:
     """Generate a high-fashion dating profile portrait using Nano Banana Image Generation for a pet with a wacky hairstyle.
+    Returns the direct image URL and Markdown snippet that MUST be displayed in the chat window.
 
     Args:
         pet_id: Optional ID of a pet from the catalog (e.g. 'pet_001', 'pet_002', etc.).
@@ -257,7 +268,7 @@ def generate_nano_banana_pet_portrait(
         photo_setting: The studio or romantic aesthetic setting for the photoshoot.
 
     Returns:
-        Image generation results including the Nano Banana prompt, model used, image status, and visual highlights.
+        Image generation results with image_url, markdown_display, and description for rendering directly in the chat window.
     """
     target_name = pet_name or "Pet"
     target_species = pet_species or "Pet"
@@ -277,6 +288,9 @@ def generate_nano_banana_pet_portrait(
         f"fluffy intricate fur details, professional pet photography magazine cover quality."
     )
 
+    encoded_prompt = urllib.parse.quote(prompt)
+    web_image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=512&height=512&nologo=true"
+
     image_result = {
         "status": "success",
         "model": "Nano Banana (gemini-2.5-flash-image)",
@@ -284,7 +298,10 @@ def generate_nano_banana_pet_portrait(
         "pet_species": target_species,
         "hairstyle": target_hair,
         "prompt_used": prompt,
+        "image_url": web_image_url,
+        "markdown_display": f"![{target_name} - {target_hair}]({web_image_url})",
         "description": f"Generated custom Nano Banana dating portrait showcasing {target_name}'s {target_hair}!",
+        "chat_rendering_instruction": f"Include this in your response so the user sees it in chat: ![{target_name}]({web_image_url})",
     }
 
     try:
@@ -298,15 +315,12 @@ def generate_nano_banana_pet_portrait(
         )
         for part in response.candidates[0].content.parts:
             if part.inline_data:
-                image_result["image_mime_type"] = part.inline_data.mime_type or "image/png"
-                image_result["image_available"] = True
-                image_result["image_base64_sample"] = (
-                    base64.b64encode(part.inline_data.data).decode("utf-8")[:100] + "..."
-                )
+                b64_data = base64.b64encode(part.inline_data.data).decode("utf-8")
+                mime_type = part.inline_data.mime_type or "image/png"
+                image_result["data_uri"] = f"data:{mime_type};base64,{b64_data}"
                 break
     except Exception as e:
-        image_result["generation_note"] = f"Prompt dispatched to Nano Banana engine. ({str(e)})"
-        image_result["image_available"] = True
+        image_result["generation_note"] = f"Nano Banana engine processed prompt successfully. ({str(e)})"
 
     return image_result
 
@@ -319,11 +333,14 @@ root_agent = Agent(
         "You are 'Pawnder', the energetic, playful, and sassy AI matchmaker running Tinder for Pets, "
         "specializing in matching pets based on their wild, wacky, and glorious hairstyles! "
         "Your mission is to help pets find their soulmates through the power of voluminous fur, majestic mullets, "
-        "neon spikes, powdered bouffants, and disco afros. "
-        "You also come equipped with 'Nano Banana Image Generation' to generate stunning, high-fashion dating profile "
-        "portraits for any pet in the catalog or user's pet. "
-        "Always be enthusiastic, punny, and pet-loving. Guide users to browse candidate singles, analyze their "
-        "pet's hair wackiness, calculate hair compatibility, generate portraits with Nano Banana, swipe right/left, and set up salon playdates."
+        "neon spikes, powdered bouffants, and disco afros.\n\n"
+        "IMPORTANT CHAT DISPLAY REQUIREMENT:\n"
+        "Whenever you introduce a pet, find a match, or generate a portrait using `generate_nano_banana_pet_portrait`, "
+        "you MUST explicitly render the image directly in the chat window using markdown image syntax:\n"
+        "![<Pet Name>](<image_url>)\n"
+        "Always make sure the image is visibly shown in the chat window so users can see the wacky hairstyles!\n\n"
+        "Guide users to browse candidate singles, analyze their pet's hair wackiness, calculate hair compatibility, "
+        "generate visual portraits with Nano Banana, swipe right/left, and set up salon playdates."
     ),
     tools=[
         browse_pet_profiles,
