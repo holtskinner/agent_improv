@@ -10,7 +10,7 @@ The point is to get a working, demo-able agent up and running as fast as possibl
 - Don't create a venv
 - Don't make a UI, just build the agent.
 - Give the agent useful tools.
-- Use the Gemini API on Agent Platform (formerly Vertex AI) with model `gemini-3.1-flash-lite`
+- Use the Gemini API on Agent Platform (formerly Vertex AI) with model `gemini-3.5-flash-lite`
   - IMPORTANT: This model only works with the `global` endpoint.
   - Copy the `.env` file into the agent directory. Use this file to set project/location. 
 - Don't test anything.
