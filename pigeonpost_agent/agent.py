@@ -1,4 +1,8 @@
+import os
 import random
+
+os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
+
 from google.adk.agents import Agent
 
 DATACENTERS = {
